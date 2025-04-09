@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-end-deployment
+  labels:
+    app: front-end
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front-end
+  template:
+    metadata:
+      labels:
+        app: front-end
+    spec:
+      containers:
+        - name: front-end
+          image: your-username/front-end:latest  # Replace with your front-end Docker image
+          ports:
+            - containerPort: 80  # Front-end typically runs on port 80
+          env:
+            - name: REACT_APP_API_URL  # Example environment variable
+              value: "http://gateway-service:3000"  # Point to the gateway service
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /  # Health check endpoint
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 2000
